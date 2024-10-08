@@ -133,27 +133,12 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
-  public static final class LauncherConstants {
-    public static final double launchPCoefficient = 0.0;
-    public static final double launchICoefficient = 0.0;
-    public static final double launchDCoefficient = 0.0;
+  public static final class ElevatorConstants {
+    public static final double elevatorPCoefficient = 0;
+    public static final double elevatorICoefficient = 0;
+    public static final double elevatorDCoefficient = 0;
 
-    // public static final double pivotPCoefficient = 0.02;
-    public static final double pivotPCoefficient = 0.04;
-    // .02
-    public static final double pivotICoefficient = 0.0;
-    public static final double pivotDCoefficient = 0.0;
-
-    // prototype numbers:
-    // P: .1 I: 0 D: 0
-
-
-    public static final double lebronPCoefficient = 0.08;
-    public static final double lebronICoefficient = 0.0;
-    public static final double lebronDCoefficient = 0.0;
-
-    // Launcher Pivot Height in meters
-    public static final double launcherPivotHeight = .43;
+   
   }
 
 

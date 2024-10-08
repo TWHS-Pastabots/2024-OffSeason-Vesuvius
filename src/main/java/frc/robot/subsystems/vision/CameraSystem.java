@@ -264,12 +264,12 @@ public class CameraSystem{
             if(target.getFiducialId() == ID)
             {
                 Double base = getTargetRange(position, ID);
-                double height = aprilTagFieldLayout.getTagPose(ID).get().getZ() + .44 + Constants.LauncherConstants.launcherPivotHeight;
+               // double height = aprilTagFieldLayout.getTagPose(ID).get().getZ() + .44 + Constants.LauncherConstants.launcherPivotHeight;
                 Double angleInRadians = null;
-                if(base != null)
-                {
-                    angleInRadians = Math.atan(height/base);
-                }
+                //if(base != null)
+                // {
+                //     angleInRadians = Math.atan(height/base);
+                // }
                 if(angleInRadians != null)
                 {
                     // This equation was found by gathering many angles and looking at their PID value and running a quadratic regression

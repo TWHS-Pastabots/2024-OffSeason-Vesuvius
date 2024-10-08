@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.IO.LED;
 
+import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.Elevator.ElevatorState;
 import frc.robot.subsystems.swerve.Drivebase;
 import frc.robot.subsystems.swerve.Drivebase.DriveState;
 import frc.robot.subsystems.vision.CameraSystem;
@@ -30,7 +32,7 @@ import frc.robot.subsystems.vision.CameraSystem;
 public class Robot extends LoggedRobot {
   //all the initialing for the systems
   private Drivebase drivebase;
-
+  private Elevator elevator;
   private LED litty;
   private CameraSystem camSystem;
   
@@ -52,7 +54,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
     drivebase = Drivebase.getInstance();
-    
+    elevator = Elevator.getInstance();
+
     litty = LED.getInstance();
     camSystem = CameraSystem.getInstance();
     camSystem.AddCamera(new PhotonCamera("Cam1"), new Transform3d(
@@ -73,9 +76,8 @@ public class Robot extends LoggedRobot {
   }
 
   @Override
-
   public void robotPeriodic() {
-        Pose2d cameraPositionTele = camSystem.calculateRobotPosition();
+      Pose2d cameraPositionTele = camSystem.calculateRobotPosition();
 
        Pose2d posTele = drivebase.updateOdometry(cameraPositionTele);
 
@@ -101,11 +103,6 @@ public class Robot extends LoggedRobot {
                 SmartDashboard.putString("Back Camera Target", "No Targets");
             }
         } 
-        
-
-
-
-      
       //testing the valuies that the camera gives us and outputing it into the dashboard
       Pose2d cameraPosition = camSystem.calculateRobotPosition();
       SmartDashboard.putNumber("Camera X Position", cameraPosition.getX());
@@ -114,7 +111,7 @@ public class Robot extends LoggedRobot {
     
     CommandScheduler.getInstance().run();
     drivebase.periodic();
-
+      
     //putting all of the info from the subsystems into the dashvoard so we can test things
     SmartDashboard.putNumber("Gyro Angle:", (drivebase.getHeading() + 90) % 360);
     SmartDashboard.putNumber("X-coordinate", drivebase.getPose().getX());
@@ -167,7 +164,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-
+    elevator.updatePose();
     /* DRIVE CONTROLS */
 
     
@@ -200,7 +197,7 @@ public class Robot extends LoggedRobot {
       drivebase.zeroHeading();
     }
     
-   
+    
 
     if (driver.getRightTriggerAxis() > 0) {
       drivebase.setDriveState(DriveState.SLOW);
@@ -233,23 +230,24 @@ public class Robot extends LoggedRobot {
     if(camSystem.getResult(1).hasTargets() && camSystem.getResult(1).getBestTarget() != null){
       SmartDashboard.putNumber("TargetPitch", Units.degreesToRadians(camSystem.getResult(1).getBestTarget().getPitch()));
     }
-      
-
-   
     drivebase.drive(xSpeed, ySpeed, rot);
    
-
-   
-
-    
-
-   
-
-    
-    
-    
-
-   
+    if(operator.getRightTriggerAxis() > 0){
+      elevator.elevatorOn();
+    }
+    if (operator.getLeftTriggerAxis() >0){
+      elevator.elevatorReverse();
+    }
+    if (operator.getPOV() == 90){
+      elevator.setElevatorState(ElevatorState.TOP);
+    } else if(operator.getPOV() == 0){
+      elevator.setElevatorState(ElevatorState.MID);
+    } else if(operator.getPOV() == 270){
+      elevator.setElevatorState(ElevatorState.BOT);
+    }
+    if(operator.getLeftBumper()) {
+      elevator.elevatorOff();
+    }
   }
     
 

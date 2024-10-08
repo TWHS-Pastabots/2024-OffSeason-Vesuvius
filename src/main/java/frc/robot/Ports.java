@@ -1,7 +1,10 @@
 package frc.robot;
 
 public class Ports {
-
+    //NEW PORTS
+    public static final int elevatorMotorL = 0;
+    public static final int elevatorMotorR = 0;
+    //OLD PORTS
     // 1 is back
 
     // swerve sparkmaxes
