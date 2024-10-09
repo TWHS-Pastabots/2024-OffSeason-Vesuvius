@@ -252,33 +252,6 @@ public class CameraSystem{
 
         return targetRange;
     }
-    /** calcuates the angle the launcher should be at to make it in the speaker; alhtough this mehtod does take in an ID to make it more
-     generic, it generally should only run on april tag #4, which is the one for the speaker
-    */ 
-    public Double getTargetAngle(int position, int ID)
-    {
-        Double targetAngle = null;
-        List<PhotonTrackedTarget> targets = getResult(position).getTargets();
-        for(PhotonTrackedTarget target : targets)
-        {
-            if(target.getFiducialId() == ID)
-            {
-                Double base = getTargetRange(position, ID);
-               // double height = aprilTagFieldLayout.getTagPose(ID).get().getZ() + .44 + Constants.LauncherConstants.launcherPivotHeight;
-                Double angleInRadians = null;
-                //if(base != null)
-                // {
-                //     angleInRadians = Math.atan(height/base);
-                // }
-                if(angleInRadians != null)
-                {
-                    // This equation was found by gathering many angles and looking at their PID value and running a quadratic regression
-                    targetAngle = (-2.441919181 * Math.pow(angleInRadians, 2)) + (-26.50060644 * angleInRadians) + 5.23837215;
-                }
-            }
-        }
-        return targetAngle;
-    }
     // Field coordinates for the april tags (converting inches to meters)
     private void initializeFiducialMap(double inchesToMeters) {
         fiducialMap.put(1, new Pose3d(593.68 * inchesToMeters, 9.68 * inchesToMeters, 53.38 * inchesToMeters, new Rotation3d(0.0, 0.0, Math.toRadians(120))));

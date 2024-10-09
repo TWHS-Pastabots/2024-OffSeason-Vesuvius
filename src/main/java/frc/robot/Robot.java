@@ -207,7 +207,6 @@ public class Robot extends LoggedRobot {
     {
       Double yaw = camSystem.getYawForTag(1, 4);
       targetRange = camSystem.getTargetRange(1, 4);
-      targetAngle = camSystem.getTargetAngle(1, 4);
       if(yaw !=null)
       {
         rot =  -yaw * .002 * Constants.DriveConstants.kMaxAngularSpeed;

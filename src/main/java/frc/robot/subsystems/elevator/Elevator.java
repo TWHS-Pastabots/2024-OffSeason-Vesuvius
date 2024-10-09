@@ -5,8 +5,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import frc.robot.Constants;
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import frc.robot.Ports;
 import frc.robot.Constants.ElevatorConstants;
@@ -21,7 +19,7 @@ public class Elevator {
     private SparkMaxPIDController elevatorControllerR;
     private static ElevatorFeedforward feedForward;
     public static ElevatorState elevatorState = ElevatorState.BOT;
-    private boolean[] connections = new boolean[9];
+    private boolean[] connections = new boolean[2];
     
 
     public enum ElevatorState{
@@ -105,6 +103,19 @@ public class Elevator {
         return encoder.getPosition();
     }
 
+    public boolean [] elevatorConnections(){
+        if(elevatorMotorL.getBusVoltage() != 0){
+            connections[0] = true;
+        }else{
+            connections[0] = false;
+        }
+        if(elevatorMotorR.getBusVoltage() != 0){
+            connections[1] = true;
+        }else{
+            connections[1] = false;
+        }
+        return connections;
+    }
     public static Elevator getInstance() {
         if (instance == null)
             instance = new Elevator();
