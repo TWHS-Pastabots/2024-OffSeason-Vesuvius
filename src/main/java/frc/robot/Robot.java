@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.IO.LED;
 
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.elevator.Elevator.ElevatorState;
 import frc.robot.subsystems.swerve.Drivebase;
 import frc.robot.subsystems.swerve.Drivebase.DriveState;
@@ -35,6 +36,7 @@ public class Robot extends LoggedRobot {
   private Elevator elevator;
   private LED litty;
   private CameraSystem camSystem;
+  private Claw claw;
   
   private static XboxController driver;
   private static XboxController operator;
@@ -55,6 +57,7 @@ public class Robot extends LoggedRobot {
   public void robotInit() {
     drivebase = Drivebase.getInstance();
     elevator = Elevator.getInstance();
+    claw = Claw.getInstance();
 
     litty = LED.getInstance();
     camSystem = CameraSystem.getInstance();
@@ -233,10 +236,32 @@ public class Robot extends LoggedRobot {
    
     if(operator.getRightTriggerAxis() > 0){
       elevator.elevatorOn();
+    }else{
+      elevator.elevatorOff();
     }
+
     if (operator.getLeftTriggerAxis() >0){
       elevator.elevatorReverse();
+    }else{
+      elevator.elevatorOff();
     }
+
+    if(operator.getRightBumper()){
+      claw.extendCylinders();
+      claw.setWheelsOn();
+    }else{
+      claw.retractCylinders();
+      claw.setWheelsOff();
+    }
+
+    if(operator.getLeftBumper()){
+      claw.extendCylinders();
+      claw.setWheelsReverse();
+    }else{
+      claw.retractCylinders();
+      claw.setWheelsOff();
+    }
+
     if (operator.getPOV() == 90){
       elevator.setElevatorState(ElevatorState.TOP);
     } else if(operator.getPOV() == 0){
@@ -244,9 +269,7 @@ public class Robot extends LoggedRobot {
     } else if(operator.getPOV() == 270){
       elevator.setElevatorState(ElevatorState.BOT);
     }
-    if(operator.getLeftBumper()) {
-      elevator.elevatorOff();
-    }
+    
   }
     
 
