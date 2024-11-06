@@ -21,7 +21,7 @@ public class LED {
 
         // PWMLED = new Spark(Ports.blinkin);
 
-        LEDs = new AddressableLED(Ports.blinkin);
+        // LEDs = new AddressableLED(Ports.blinkin);
 
         buffer = new AddressableLEDBuffer(length);
         LEDs.setLength(buffer.getLength());

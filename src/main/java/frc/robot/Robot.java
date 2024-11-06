@@ -34,10 +34,11 @@ public class Robot extends LoggedRobot {
   //all the initialing for the systems
   private Drivebase drivebase;
   private Elevator elevator;
-  private LED litty;
-  private CameraSystem camSystem;
+  // private LED litty;
+  // private CameraSystem camSystem;
   private Claw claw;
-  
+  private static GenericHID board;
+  private static Joystick stick;
   private static XboxController driver;
   private static XboxController operator;
   //initialization of the auton chooser in the dashboard
@@ -45,8 +46,8 @@ public class Robot extends LoggedRobot {
 
 
 
-  Double targetRange = null;
-  Double targetAngle = null;
+  // Double targetRange = null;
+  // Double targetAngle = null;
 
   
 
@@ -59,16 +60,18 @@ public class Robot extends LoggedRobot {
     elevator = Elevator.getInstance();
     claw = Claw.getInstance();
 
-    litty = LED.getInstance();
-    camSystem = CameraSystem.getInstance();
-    camSystem.AddCamera(new PhotonCamera("Cam1"), new Transform3d(
-        new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0))
-        ,  true);
+    // litty = LED.getInstance();
+    // camSystem = CameraSystem.getInstance();
+    // camSystem.AddCamera(new PhotonCamera("Cam1"), new Transform3d(
+    //     new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0))
+    //     ,  true);
 
-    camSystem.AddCamera(new PhotonCamera("Cam2"),  new Transform3d(
-      new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0)),
-       true);
+    // camSystem.AddCamera(new PhotonCamera("Cam2"),  new Transform3d(
+    //   new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0)),
+    //    true);
 
+    // jun = new GenericHID(2);
+    // stick = new Joystick(2);
 
     driver = new XboxController(0);
     operator = new XboxController(1);
@@ -80,45 +83,45 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
-      Pose2d cameraPositionTele = camSystem.calculateRobotPosition();
+      // Pose2d cameraPositionTele = camSystem.calculateRobotPosition();
 
-       Pose2d posTele = drivebase.updateOdometry(cameraPositionTele);
+      //  Pose2d posTele = drivebase.updateOdometry(cameraPositionTele);
 
 
-        SmartDashboard.putNumber("Odometry X", posTele.getX());
-        SmartDashboard.putNumber("Odometry Y", posTele.getY());
+      //   SmartDashboard.putNumber("Odometry X", posTele.getX());
+      //   SmartDashboard.putNumber("Odometry Y", posTele.getY());
 
       //this is getting the data from the cameras through the cameraSystem class 
-     if (camSystem.getCamera(0).isConnected()) {
-            PhotonPipelineResult backResult = camSystem.getResult(0);      
-            if (backResult.hasTargets()) {
-                PhotonTrackedTarget target = backResult.getBestTarget();
-                Transform3d bestCameraToTarget = target.getBestCameraToTarget();
-                double distance  = bestCameraToTarget.getTranslation().getNorm();
-                SmartDashboard.putString("Back Camera Target", "Yes Targets");
-                SmartDashboard.putNumber("Back to Target", distance);
-                SmartDashboard.putNumber("Back Camera Target Yaw", target.getYaw());
-                SmartDashboard.putNumber("Back Camera Target Pitch", target.getPitch());
-                SmartDashboard.putNumber("Back Camera Target Area", target.getArea());
-                SmartDashboard.putNumber("ID", target.getFiducialId());
+    //  if (camSystem.getCamera(0).isConnected()) {
+    //         PhotonPipelineResult backResult = camSystem.getResult(0);      
+    //         if (backResult.hasTargets()) {
+    //             PhotonTrackedTarget target = backResult.getBestTarget();
+    //             Transform3d bestCameraToTarget = target.getBestCameraToTarget();
+    //             double distance  = bestCameraToTarget.getTranslation().getNorm();
+    //             SmartDashboard.putString("Back Camera Target", "Yes Targets");
+    //             SmartDashboard.putNumber("Back to Target", distance);
+    //             SmartDashboard.putNumber("Back Camera Target Yaw", target.getYaw());
+    //             SmartDashboard.putNumber("Back Camera Target Pitch", target.getPitch());
+    //             SmartDashboard.putNumber("Back Camera Target Area", target.getArea());
+    //             SmartDashboard.putNumber("ID", target.getFiducialId());
 
-            } else if(backResult.hasTargets() == false) {
-                SmartDashboard.putString("Back Camera Target", "No Targets");
-            }
-        } 
+    //         } else if(backResult.hasTargets() == false) {
+    //             SmartDashboard.putString("Back Camera Target", "No Targets");
+    //         }
+    //     } 
       //testing the valuies that the camera gives us and outputing it into the dashboard
-      Pose2d cameraPosition = camSystem.calculateRobotPosition();
-      SmartDashboard.putNumber("Camera X Position", cameraPosition.getX());
-      SmartDashboard.putNumber("Camera Y Position", cameraPosition.getY());
-      SmartDashboard.putNumber("Camera Heading", cameraPosition.getRotation().getDegrees());
+      // Pose2d cameraPosition = camSystem.calculateRobotPosition();
+      // SmartDashboard.putNumber("Camera X Position", cameraPosition.getX());
+      // SmartDashboard.putNumber("Camera Y Position", cameraPosition.getY());
+      // SmartDashboard.putNumber("Camera Heading", cameraPosition.getRotation().getDegrees());
     
     CommandScheduler.getInstance().run();
     drivebase.periodic();
       
     //putting all of the info from the subsystems into the dashvoard so we can test things
     SmartDashboard.putNumber("Gyro Angle:", (drivebase.getHeading() + 90) % 360);
-    SmartDashboard.putNumber("X-coordinate", drivebase.getPose().getX());
-    SmartDashboard.putNumber("Y-coordinate", drivebase.getPose().getY());
+    // SmartDashboard.putNumber("X-coordinate", drivebase.getPose().getX());
+    // SmartDashboard.putNumber("Y-coordinate", drivebase.getPose().getY());
 
  
   }
@@ -128,7 +131,7 @@ public class Robot extends LoggedRobot {
     //getting the value we chose from the dashboard and putting it into motion in the auton
     m_autoSelected = m_chooser.getSelected();
 
-    drivebase.resetOdometry(PathPlannerAuto.getStaringPoseFromAutoFile(m_chooser.getSelected().getName()));
+    // drivebase.resetOdometry(PathPlannerAuto.getStaringPoseFromAutoFile(m_chooser.getSelected().getName()));
     
     
 //schedules the command so it actually begins moving
@@ -142,57 +145,90 @@ public class Robot extends LoggedRobot {
     //updating the intake for the autointake command
     //using cameras to calculate the robot position instead of odometry.
     //we use a mix of odometry + camera positions to calculate the robot position
-    Pose2d cameraPosition = camSystem.calculateRobotPosition(); 
-    Pose2d pose = drivebase.updateOdometry(cameraPosition);
+    // Pose2d cameraPosition = camSystem.calculateRobotPosition(); 
+    // Pose2d pose = drivebase.updateOdometry(cameraPosition);
 
-    SmartDashboard.putNumber("Auto X", drivebase.getPose().getX());
-    SmartDashboard.putNumber("Auto Y", drivebase.getPose().getY());
-    SmartDashboard.putNumber("Odometry X", pose.getX());
-    SmartDashboard.putNumber("Odometry Y", pose.getY());
+    // SmartDashboard.putNumber("Auto X", drivebase.getPose().getX());
+    // SmartDashboard.putNumber("Auto Y", drivebase.getPose().getY());
+    // SmartDashboard.putNumber("Odometry X", pose.getX());
+    // SmartDashboard.putNumber("Odometry Y", pose.getY());
   }
 
   @Override
   public void teleopInit() {
     //as soon as we begin teleop we desable the auton selection
-    litty.setBlue();
+    // litty.setBlue();
     if (m_autoSelected != null) {
       m_autoSelected.cancel();
     }
 
-    Translation2d testxy = new Translation2d(16.57 - 14.7, 5.54);
-    Rotation2d testRot = new Rotation2d(0);
-    Pose2d test = new Pose2d(testxy, testRot);
-    drivebase.resetOdometry(test);
+    // Translation2d testxy = new Translation2d(16.57 - 14.7, 5.54);
+    // Rotation2d testRot = new Rotation2d(0);
+    // Pose2d test = new Pose2d(testxy, testRot);
+    // drivebase.resetOdometry(test);
   }
 
   @Override
   public void teleopPeriodic() {
-    elevator.updatePose();
+    // elevator.updatePose();
     /* DRIVE CONTROLS */
 
     
     //setting inputs for driving through the driver controller
-    double ySpeed = drivebase.inputDeadband(-driver.getLeftX());
-    double xSpeed = drivebase.inputDeadband(driver.getLeftY());
-    double rot = drivebase.inputDeadband(-driver.getRightX());
-    //using buttons to rotate the robot by increments of 90 degrees
-    if (driver.getAButton()) {
-      drivebase.currHeading = -1;
-      drivebase.rotateTo(xSpeed, ySpeed, 180);
-    } else if (driver.getBButton()) {
-      drivebase.currHeading = -1;
-      drivebase.rotateTo(xSpeed, ySpeed, 270);
-    } else if (driver.getYButton()) {
-      drivebase.currHeading = -1;
-      drivebase.rotateTo(xSpeed, ySpeed, 0);
-    } else if (driver.getXButton()) {
-      drivebase.currHeading = -1;
-      drivebase.rotateTo(xSpeed, ySpeed, 90);
-    } else if (driver.getLeftTriggerAxis() > 0) {
-    } else {
-      drivebase.currHeading = -1;
-      drivebase.drive(xSpeed, ySpeed, rot);
+    // double ySpeed = drivebase.inputDeadband(-driver.getLeftX());
+    // double xSpeed = drivebase.inputDeadband(driver.getLeftY());
+    // double rot = drivebase.inputDeadband(-driver.getRightX());
+
+    double ySpeed = drivebase.inputDeadband(-stick.getX() * .17);
+    double xSpeed = drivebase.inputDeadband(stick.getY() * .17);
+    double rot = drivebase.inputDeadband(stick.getRawAxis(3)*.17);
+    //rot = drivebase.inputDeadband(joystick.getZ()*.25);
+
+   if(stick.getZ() > 0.0){
+    rot = drivebase.inputDeadband(stick.getZ()*.17);
+   }else{
+    rot = drivebase.inputDeadband(-stick.getRawAxis(3)*.17);
+   }
+    drivebase.drive(xSpeed, ySpeed, rot);
+
+
+
+    if(board.getRawButton(2)){
+      claw.setWheelsReverse();
+    }else if(board.getRawButton(1)){
+      claw.setWheelsOn();
+    }else{
+      claw.setWheelsOff();
     }
+
+    if(board.getRawButton(3)){
+      elevator.elevatorOn();
+    }else if(board.getRawButton(4)){
+      elevator.elevatorReverse();
+    }else{
+      elevator.elevatorOff();
+    }
+
+
+
+    //using buttons to rotate the robot by increments of 90 degrees
+    // if (driver.getAButton()) {
+    //   drivebase.currHeading = -1;
+    //   drivebase.rotateTo(xSpeed, ySpeed, 180);
+    // } else if (driver.getBButton()) {
+    //   drivebase.currHeading = -1;
+    //   drivebase.rotateTo(xSpeed, ySpeed, 270);
+    // } else if (driver.getYButton()) {
+    //   drivebase.currHeading = -1;
+    //   drivebase.rotateTo(xSpeed, ySpeed, 0);
+    // } else if (driver.getXButton()) {
+    //   drivebase.currHeading = -1;
+    //   drivebase.rotateTo(xSpeed, ySpeed, 90);
+    // } else if (driver.getLeftTriggerAxis() > 0) {
+    // } else {
+    //   drivebase.currHeading = -1;
+    //   drivebase.drive(xSpeed, ySpeed, rot);
+    // }
 
 
   
@@ -202,74 +238,85 @@ public class Robot extends LoggedRobot {
     
     
 
-    if (driver.getRightTriggerAxis() > 0) {
-      drivebase.setDriveState(DriveState.SLOW);
-    } 
-    //getting yaw from the tag to rotate towards it. The robot will allign itself with the 
-    if(driver.getLeftTriggerAxis() > 0)
-    {
-      Double yaw = camSystem.getYawForTag(1, 4);
-      targetRange = camSystem.getTargetRange(1, 4);
-      if(yaw !=null)
-      {
-        rot =  -yaw * .002 * Constants.DriveConstants.kMaxAngularSpeed;
-      }
-      // if(targetRange != null){
-      //   xSpeed = (targetRange - 2.5) * .1 * Constants.DriveConstants.kMaxSpeedMetersPerSecond;
-      // }
+    // if (driver.getRightTriggerAxis() > 0) {
+    //   drivebase.setDriveState(DriveState.SLOW);
+    // } 
+    // //getting yaw from the tag to rotate towards it. The robot will allign itself with the 
+    // if(driver.getLeftTriggerAxis() > 0)
+    // {
+    //   Double yaw = camSystem.getYawForTag(1, 4);
+    //   targetRange = camSystem.getTargetRange(1, 4);
+    //   if(yaw !=null)
+    //   {
+    //     rot =  -yaw * .002 * Constants.DriveConstants.kMaxAngularSpeed;
+    //   }
+    //   // if(targetRange != null){
+    //   //   xSpeed = (targetRange - 2.5) * .1 * Constants.DriveConstants.kMaxSpeedMetersPerSecond;
+    //   // }
       
       
-    }
+    // }
     
-    if(targetRange != null)
-    {
-      SmartDashboard.putNumber("TargetRange", targetRange);
-    }
-    if(targetAngle != null)
-    {
-      SmartDashboard.putNumber("Target Angle", targetAngle);
-    }
-    if(camSystem.getResult(1).hasTargets() && camSystem.getResult(1).getBestTarget() != null){
-      SmartDashboard.putNumber("TargetPitch", Units.degreesToRadians(camSystem.getResult(1).getBestTarget().getPitch()));
-    }
-    drivebase.drive(xSpeed, ySpeed, rot);
-   
-    if(operator.getRightTriggerAxis() > 0){
-      elevator.elevatorOn();
+    // if(targetRange != null)
+    // {
+    //   SmartDashboard.putNumber("TargetRange", targetRange);
+    // }
+    // if(targetAngle != null)
+    // {
+    //   SmartDashboard.putNumber("Target Angle", targetAngle);
+    // }
+    // if(camSystem.getResult(1).hasTargets() && camSystem.getResult(1).getBestTarget() != null){
+    //   SmartDashboard.putNumber("TargetPitch", Units.degreesToRadians(camSystem.getResult(1).getBestTarget().getPitch()));
+    // }
+    if(driver.getRightBumper()){
+      claw.setWheelsOn();
+    }else if (driver.getLeftBumper()){
+      claw.setWheelsReverse();
     }else{
-      elevator.elevatorOff();
+      claw.setWheelsOff();
     }
 
-    if (operator.getLeftTriggerAxis() >0){
+    if(driver.getRightTriggerAxis()> 0.0){
+      elevator.elevatorOn();
+    }else if(driver.getLeftTriggerAxis()>0.0){
       elevator.elevatorReverse();
     }else{
       elevator.elevatorOff();
     }
 
-    if(operator.getRightBumper()){
-      claw.extendCylinders();
-      claw.setWheelsOn();
-    }else{
-      claw.retractCylinders();
-      claw.setWheelsOff();
-    }
-
-    if(operator.getLeftBumper()){
-      claw.extendCylinders();
-      claw.setWheelsReverse();
-    }else{
-      claw.retractCylinders();
-      claw.setWheelsOff();
-    }
-
-    if (operator.getPOV() == 90){
-      elevator.setElevatorState(ElevatorState.TOP);
-    } else if(operator.getPOV() == 0){
-      elevator.setElevatorState(ElevatorState.MID);
-    } else if(operator.getPOV() == 270){
-      elevator.setElevatorState(ElevatorState.BOT);
-    }
+    // if(jun.getRawButton(1)){
+    //   elevator.elevatorOn();
+    //   SmartDashboard.putString("Button 1 pressed", "Y");
+    // }else{
+    //   SmartDashboard.putString("Button 1 pressed", "N");
+    // }
+    // if(jun.getRawButton(2)){
+    //   elevator.elevatorReverse();
+    //   SmartDashboard.putString("Button 2 pressed", "Y");
+    // }else{
+    //   SmartDashboard.putString("Button 2 pressed", "N");
+    // }
+    // if(jun.getRawButton(3)){
+    //   claw.setWheelsOn();
+    //   SmartDashboard.putString("Button 3 pressed", "Y");
+    // }else{
+    //   SmartDashboard.putString("Button 3 pressed", "N");
+    // }
     
+
+    // if(jun.getRawButton(5)){
+    //   claw.setWheelsOff();
+    //   elevator.elevatorOff();
+    // }
+    // if (operator.getPOV() == 90){
+    //   elevator.setElevatorState(ElevatorState.TOP);
+    // } else if(operator.getPOV() == 0){
+    //   elevator.setElevatorState(ElevatorState.MID);
+    // } else if(operator.getPOV() == 270){
+    //   elevator.setElevatorState(ElevatorState.BOT);
+    // }
+    
+
   }
     
 
