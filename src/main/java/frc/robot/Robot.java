@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.function.BiPredicate;
+
 import org.littletonrobotics.junction.LoggedRobot;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -70,8 +72,8 @@ public class Robot extends LoggedRobot {
     //   new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0)),
     //    true);
 
-    // jun = new GenericHID(2);
-    // stick = new Joystick(2);
+    board = new GenericHID(2);
+    stick = new Joystick(2);
 
     driver = new XboxController(0);
     operator = new XboxController(1);
@@ -231,9 +233,9 @@ public class Robot extends LoggedRobot {
 
 
   
-    if (driver.getPOV() == 0) {
-      drivebase.zeroHeading();
-    }
+    // if (driver.getPOV() == 0) {
+    //   drivebase.zeroHeading();
+    // }
     
     
 
@@ -267,21 +269,21 @@ public class Robot extends LoggedRobot {
     // if(camSystem.getResult(1).hasTargets() && camSystem.getResult(1).getBestTarget() != null){
     //   SmartDashboard.putNumber("TargetPitch", Units.degreesToRadians(camSystem.getResult(1).getBestTarget().getPitch()));
     // }
-    if(driver.getRightBumper()){
-      claw.setWheelsOn();
-    }else if (driver.getLeftBumper()){
-      claw.setWheelsReverse();
-    }else{
-      claw.setWheelsOff();
-    }
+    // if(driver.getRightBumper()){
+    //   claw.setWheelsOn();
+    // }else if (driver.getLeftBumper()){
+    //   claw.setWheelsReverse();
+    // }else{
+    //   claw.setWheelsOff();
+    // }
 
-    if(driver.getRightTriggerAxis()> 0.0){
-      elevator.elevatorOn();
-    }else if(driver.getLeftTriggerAxis()>0.0){
-      elevator.elevatorReverse();
-    }else{
-      elevator.elevatorOff();
-    }
+    // if(driver.getRightTriggerAxis()> 0.0){
+    //   elevator.elevatorOn();
+    // }else if(driver.getLeftTriggerAxis()>0.0){
+    //   elevator.elevatorReverse();
+    // }else{
+    //   elevator.elevatorOff();
+    // }
 
     // if(jun.getRawButton(1)){
     //   elevator.elevatorOn();
