@@ -182,9 +182,8 @@ public class Robot extends LoggedRobot {
     double ySpeed = drivebase.inputDeadband(-stick.getX() * .17);
     double xSpeed = drivebase.inputDeadband(stick.getY() * .17);
     double rot = drivebase.inputDeadband(stick.getRawAxis(3)*.17);
-    //rot = drivebase.inputDeadband(joystick.getZ()*.25);
 
-   if(stick.getZ() > 0.0){
+    if(stick.getZ() > 0.0){
     rot = drivebase.inputDeadband(stick.getZ()*.17);
    }else{
     rot = drivebase.inputDeadband(-stick.getRawAxis(3)*.17);
