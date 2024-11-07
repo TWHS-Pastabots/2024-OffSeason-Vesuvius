@@ -196,15 +196,15 @@ public class Robot extends LoggedRobot {
 
     if(board.getRawButton(2)){
       claw.setWheelsReverse();
-    }else if(board.getRawButton(1)){
+    }else if(board.getRawButton(4)){
       claw.setWheelsOn();
     }else{
       claw.setWheelsOff();
     }
 
-    if(board.getRawButton(3)){
+    if(board.getRawButton(1)){
       elevator.elevatorOn();
-    }else if(board.getRawButton(4)){
+    }else if(board.getRawButton(3)){
       elevator.elevatorReverse();
     }else{
       elevator.elevatorOff();
