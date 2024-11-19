@@ -44,17 +44,17 @@ public class Claw {
         wheel2.burnFlash();
 
          // Initialize compressor and solenoids (assuming PCM module and double solenoids)
-        //  compressor = new Compressor(0, PneumaticsModuleType.REVPH);
-        //  cylinderR = new DoubleSolenoid(PneumaticsModuleType.REVPH, 15, 13); // PCM channels 0, 1
-        //  cylinderL = new DoubleSolenoid(PneumaticsModuleType.REVPH, 14, 12); // PCM channels 2, 3
+    //      compressor = new Compressor(PneumaticsModuleType.REVPH);
+    //      cylinderR = new DoubleSolenoid(PneumaticsModuleType.REVPH, 13, 15); // PCM channels 0, 1
+    //      cylinderL = new DoubleSolenoid(PneumaticsModuleType.REVPH, 12, 14); // PCM channels 2, 3
 
-        //  compressor.enableAnalog(10, 100);
-        //  retractCylinders();
-    }
+    //      compressor.enableAnalog(10, 50);
+    //      retractCylinders();
+     }
 
     public void setWheelsOn(){
-        wheel1.set(.75);
-        wheel2.set(.75);
+        wheel1.set(.65);
+        wheel2.set(.65);
     }
 
     public void setWheelsReverse(){
@@ -66,6 +66,10 @@ public class Claw {
         wheel1.set(0.05);
         wheel2.set(0.05);
     }
+
+    // public boolean isCompressorEnabled(){
+    //     return compressor.isEnabled();
+    // }
 
 
     // Method to turn on compressor (already handled by enableDigital in constructor)
@@ -79,7 +83,7 @@ public class Claw {
     //     cylinderL.set(DoubleSolenoid.Value.kForward); // Extend left cylinder
     // }
 
-    // Method to retract both cylinders
+    // // Method to retract both cylinders
     // public void retractCylinders() {
     //     cylinderR.set(DoubleSolenoid.Value.kReverse); // Retract right cylinder
     //     cylinderL.set(DoubleSolenoid.Value.kReverse); // Retract left cylinder

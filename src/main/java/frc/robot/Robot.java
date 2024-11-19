@@ -7,6 +7,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.fasterxml.jackson.databind.jsontype.impl.ClassNameIdResolver;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,8 +17,11 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticHub;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.IO.LED;
 
 import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.claw.Claw;
 import frc.robot.subsystems.elevator.Elevator.ElevatorState;
 import frc.robot.subsystems.swerve.Drivebase;
@@ -39,6 +44,7 @@ public class Robot extends LoggedRobot {
   // private LED litty;
   // private CameraSystem camSystem;
   private Claw claw;
+  private Climber climber;
   private static GenericHID board;
   private static Joystick stick;
   private static XboxController driver;
@@ -46,21 +52,29 @@ public class Robot extends LoggedRobot {
   //initialization of the auton chooser in the dashboard
   private Command m_autoSelected;
 
+  // private final Compressor VCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
+
 
 
   // Double targetRange = null;
   // Double targetAngle = null;
 
-  
+   
 
   //that is a chooser for the autons utilizing the sendableChooser which allows us to choose the auton commands
   private SendableChooser<Command> m_chooser = new SendableChooser<>();
 
+
   @Override
   public void robotInit() {
+
+
+
     drivebase = Drivebase.getInstance();
     elevator = Elevator.getInstance();
     claw = Claw.getInstance();
+    climber = Climber.getInstance();
+
 
     // litty = LED.getInstance();
     // camSystem = CameraSystem.getInstance();
@@ -85,11 +99,14 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
+    elevator.updatePose();
+     SmartDashboard.putNumber("Elevator Position", elevator.getPosition(elevator.encoderL));
+    SmartDashboard.putNumber("Elevator Position R", elevator.getPosition(elevator.encoderR));
       // Pose2d cameraPositionTele = camSystem.calculateRobotPosition();
 
       //  Pose2d posTele = drivebase.updateOdometry(cameraPositionTele);
 
-
+      // claw.compressor.enableAnalog(10,100);
       //   SmartDashboard.putNumber("Odometry X", posTele.getX());
       //   SmartDashboard.putNumber("Odometry Y", posTele.getY());
 
@@ -116,12 +133,28 @@ public class Robot extends LoggedRobot {
       // SmartDashboard.putNumber("Camera X Position", cameraPosition.getX());
       // SmartDashboard.putNumber("Camera Y Position", cameraPosition.getY());
       // SmartDashboard.putNumber("Camera Heading", cameraPosition.getRotation().getDegrees());
+
+
+      // SmartDashboard.putNumber("Analog", VCompressor.getAnalogVoltage());
+      // SmartDashboard.putNumber("Compressor Pressure", VCompressor.getPressure());
+      // SmartDashboard.putBoolean("Compressor", VCompressor.isEnabled());
+      // SmartDashboard.putNumber("Compressor Current", VCompressor.getCurrent());
     
     CommandScheduler.getInstance().run();
     drivebase.periodic();
       
     //putting all of the info from the subsystems into the dashvoard so we can test things
     SmartDashboard.putNumber("Gyro Angle:", (drivebase.getHeading() + 90) % 360);
+    // SmartDashboard.putNumber("CRF", claw.cylinderR.getFwdChannel());
+    // SmartDashboard.putNumber("CRR", claw.cylinderR.getRevChannel());
+    // SmartDashboard.putNumber("CLF", claw.cylinderL.getFwdChannel());
+    // SmartDashboard.putNumber("CLR", claw.cylinderL.getRevChannel());
+    // SmartDashboard.putNumber("Compressor C", claw.isCompressorEnabled());
+    // SmartDashboard.putBoolean("Compressor Enabled?", claw.isCompressorEnabled());
+    // SmartDashboard.putNumber("Compressor V", claw.compressor.getAnalogVoltage());
+    // SmartDashboard.putNumber("Compressor C", claw.compressor.getCurrent());
+    //  SmartDashboard.putNumber("Compressor P", claw.compressor.getPressure());
+
     // SmartDashboard.putNumber("X-coordinate", drivebase.getPose().getX());
     // SmartDashboard.putNumber("Y-coordinate", drivebase.getPose().getY());
 
@@ -175,40 +208,61 @@ public class Robot extends LoggedRobot {
     // elevator.updatePose();
     /* DRIVE CONTROLS */
 
-    
+    // SmartDashboard.putNumber("Elevator Position", elevator.getPosition(elevator.encoderL));
+    // SmartDashboard.putNumber("Elevator Position R", elevator.getPosition(elevator.encoderR));
     //setting inputs for driving through the driver controller
-    // double ySpeed = drivebase.inputDeadband(-driver.getLeftX());
-    // double xSpeed = drivebase.inputDeadband(driver.getLeftY());
-    // double rot = drivebase.inputDeadband(-driver.getRightX());
+    double ySpeed = drivebase.inputDeadband(-driver.getLeftX());
+    double xSpeed = drivebase.inputDeadband(driver.getLeftY());
+    double rot = drivebase.inputDeadband(-driver.getRightX());
 
-    double ySpeed = drivebase.inputDeadband(-stick.getX() * .17);
-    double xSpeed = drivebase.inputDeadband(stick.getY() * .17);
-    double rot = drivebase.inputDeadband(stick.getRawAxis(3)*.17);
+  //   double ySpeed = drivebase.inputDeadband(-stick.getX() * .17);
+  //   double xSpeed = drivebase.inputDeadband(stick.getY() * .17);
+  //   double rot = drivebase.inputDeadband(stick.getRawAxis(3)*.17);
 
-    if(stick.getZ() > 0.0){
-    rot = drivebase.inputDeadband(stick.getZ()*.17);
-   }else{
-    rot = drivebase.inputDeadband(-stick.getRawAxis(3)*.17);
-   }
+  //   if(stick.getZ() > 0.0){
+  //   rot = drivebase.inputDeadband(stick.getZ()*.17);
+  //  }else{
+  //   rot = drivebase.inputDeadband(-stick.getRawAxis(3)*.17);
+  //  }
     drivebase.drive(xSpeed, ySpeed, rot);
 
 
-
-    if(board.getRawButton(2)){
-      claw.setWheelsReverse();
-    }else if(board.getRawButton(4)){
+    if(driver.getRightBumper()){
       claw.setWheelsOn();
+    }else if(driver.getLeftBumper()){
+      claw.setWheelsReverse();
     }else{
       claw.setWheelsOff();
     }
 
-    if(board.getRawButton(1)){
+    if(driver.getRightTriggerAxis()>0.0){
       elevator.elevatorOn();
-    }else if(board.getRawButton(3)){
+      
+    }else if(driver.getLeftTriggerAxis()>0.0){
       elevator.elevatorReverse();
     }else{
       elevator.elevatorOff();
     }
+
+    //  if(driver.getRightBumper()){
+    //   climber.setLifterOn();
+    // }else if(driver.getLeftBumper()){
+    //   climber.setLifterReverse();
+    // }else{
+    //   climber.setLifterOff();
+    // }
+
+    //  if(driver.getXButton()){
+    //   climber.setTommysWheelsOn();
+    // }else if(driver.getBButton()){
+    //   climber.setTommysWheelsReverse();
+    // }else{
+    //   climber.setTommysWheelsOff();
+    // }
+
+  
+
+
 
 
 
@@ -233,9 +287,9 @@ public class Robot extends LoggedRobot {
 
 
   
-    // if (driver.getPOV() == 0) {
-    //   drivebase.zeroHeading();
-    // }
+    if (driver.getPOV() == 0) {
+      drivebase.zeroHeading();
+    }
     
     
 
@@ -277,27 +331,27 @@ public class Robot extends LoggedRobot {
     //   claw.setWheelsOff();
     // }
 
-    // if(driver.getRightTriggerAxis()> 0.0){
+    // if(operator.getRightTriggerAxis()> 0.0){
     //   elevator.elevatorOn();
-    // }else if(driver.getLeftTriggerAxis()>0.0){
+    // }else if(operator.getLeftTriggerAxis()>0.0){
     //   elevator.elevatorReverse();
     // }else{
     //   elevator.elevatorOff();
     // }
 
-    // if(jun.getRawButton(1)){
+    // if(board.getRawButton(1)){
     //   elevator.elevatorOn();
     //   SmartDashboard.putString("Button 1 pressed", "Y");
     // }else{
     //   SmartDashboard.putString("Button 1 pressed", "N");
     // }
-    // if(jun.getRawButton(2)){
+    // if(board.getRawButton(2)){
     //   elevator.elevatorReverse();
     //   SmartDashboard.putString("Button 2 pressed", "Y");
     // }else{
     //   SmartDashboard.putString("Button 2 pressed", "N");
     // }
-    // if(jun.getRawButton(3)){
+    // if(board.getRawButton(3)){
     //   claw.setWheelsOn();
     //   SmartDashboard.putString("Button 3 pressed", "Y");
     // }else{

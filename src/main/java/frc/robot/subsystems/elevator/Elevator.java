@@ -32,8 +32,8 @@ public class Elevator {
     public static Elevator instance;
     private CANSparkMax elevatorMotorL;
     private CANSparkMax elevatorMotorR;
-    private static RelativeEncoder encoderL;
-    private static RelativeEncoder encoderR;
+    public RelativeEncoder encoderL;
+    public RelativeEncoder encoderR;
     private SparkMaxPIDController elevatorControllerL;
     private SparkMaxPIDController elevatorControllerR;
     private static ElevatorFeedforward feedForward;
@@ -45,7 +45,7 @@ public class Elevator {
         //THESE ARE JUST GUESSES CHANGE THEM LATER
         BOT(0),
         MID(25),
-        TOP(50);
+        TOP(-40);
 
         public double position;
         private ElevatorState(double position){
@@ -58,7 +58,8 @@ public class Elevator {
         elevatorMotorL.setSmartCurrentLimit(60);
         elevatorMotorL.setIdleMode(IdleMode.kBrake);
         elevatorMotorL.setInverted(true);
-        elevatorMotorL.setOpenLoopRampRate(3);
+        // elevatorMotorL.setOpenLoopRampRate(10);
+        // elevatorMotorL.setClosedLoopRampRate(1);
 
 
         elevatorMotorR = new CANSparkMax(Ports.elevatorMotorR, MotorType.kBrushless);
@@ -66,51 +67,56 @@ public class Elevator {
         elevatorMotorR.setSmartCurrentLimit(60);
         elevatorMotorR.setIdleMode(IdleMode.kBrake);
         elevatorMotorR.setInverted(false);
-        elevatorMotorR.setOpenLoopRampRate(3);
+        // elevatorMotorR.setOpenLoopRampRate(10);
+        // elevatorMotorR.setClosedLoopRampRate(1);
 
 
 
         //JUST A GUESS TUNE LATER
-        feedForward = new ElevatorFeedforward(0.01, 0.0, 0.0, 0.0);
-        // encoderL = elevatorMotorL.getEncoder();
-        // elevatorControllerL = elevatorMotorL.getPIDController();
-        
-        // elevatorControllerL.setP(ElevatorConstants.elevatorPCoefficient);
-        // elevatorControllerL.setI(ElevatorConstants.elevatorICoefficient);
-        // elevatorControllerL.setD(ElevatorConstants.elevatorDCoefficient);
-        // elevatorControllerL.setFeedbackDevice(encoderL);
-        // elevatorControllerL.setOutputRange(-1, 1);
+        feedForward = new ElevatorFeedforward(-0.15, -0.18, 0.0, 0.0);
 
-        // encoderR = elevatorMotorR.getEncoder();
-        // elevatorControllerR = elevatorMotorR.getPIDController();
+        //-.3 ks
+        encoderL = elevatorMotorL.getEncoder();
+        elevatorControllerL = elevatorMotorL.getPIDController();
         
-        // elevatorControllerR.setP(ElevatorConstants.elevatorPCoefficient);
-        // elevatorControllerR.setI(ElevatorConstants.elevatorICoefficient);
-        // elevatorControllerR.setD(ElevatorConstants.elevatorDCoefficient);
-        // elevatorControllerR.setFeedbackDevice(encoderR);
-        // elevatorControllerR.setOutputRange(-1, 1);
+        elevatorControllerL.setP(ElevatorConstants.elevatorPCoefficient);
+        elevatorControllerL.setI(ElevatorConstants.elevatorICoefficient);
+        elevatorControllerL.setD(ElevatorConstants.elevatorDCoefficient);
+        elevatorControllerL.setFeedbackDevice(encoderL);
+        elevatorControllerL.setOutputRange(-.5, .5);
+        encoderR = elevatorMotorR.getEncoder();
+        elevatorControllerR = elevatorMotorR.getPIDController();
+        
+        elevatorControllerR.setP(ElevatorConstants.elevatorPCoefficient);
+        elevatorControllerR.setI(ElevatorConstants.elevatorICoefficient);
+        elevatorControllerR.setD(ElevatorConstants.elevatorDCoefficient);
+        elevatorControllerR.setFeedbackDevice(encoderR);
+        elevatorControllerR.setOutputRange(-.5, .5);
         elevatorMotorL.burnFlash();
         elevatorMotorR.burnFlash();
     }
 
-    // public void updatePose(){
-    //     elevatorControllerL.setReference(elevatorState.position, CANSparkMax.ControlType.kPosition, 0,
-    //     feedForward.calculate(encoderL.getPosition(), 0));
+    public void updatePose(){
+        elevatorControllerL.setReference(-20, CANSparkMax.ControlType.kPosition, 0,
+        feedForward.calculate(encoderL.getPosition(), 0));
 
-    //     elevatorControllerR.setReference(elevatorState.position, CANSparkMax.ControlType.kPosition, 0,
-    //     feedForward.calculate(encoderR.getPosition(), 0));
-    // }
+        elevatorControllerR.setReference(-20, CANSparkMax.ControlType.kPosition, 0,
+        feedForward.calculate(encoderR.getPosition(), 0));
+
+       
+        
+    }
     public void elevatorOn(){
-        elevatorMotorL.set(.25);
-        elevatorMotorR.set(.25);
+        // // elevatorMotorL.set(-.25);
+        // elevatorMotorR.set(-.25);
     }
     public void elevatorReverse(){
-        elevatorMotorL.set(-.5);
-        elevatorMotorR.set(-.5);
+        // elevatorMotorL.set(.5);
+        // elevatorMotorR.set(.5);
     }
     public void elevatorOff(){
-        elevatorMotorL.set(-.05);
-        elevatorMotorR.set(-.05);
+        // elevatorMotorL.set(0);
+        // elevatorMotorR.set(0);
 
         //  // Calculate the feedforward voltage to counteract gravity
         // double feedforwardVoltage = feedForward.calculate(0); // velocity = 0, since we're holding steady
@@ -131,7 +137,9 @@ public class Elevator {
     public double getPosition(RelativeEncoder encoder) {
         return encoder.getPosition();
     }
-
+    public boolean hasReachedPose(double tolerance){
+        return Math.abs(getPosition(encoderL) - elevatorState.position) < tolerance;
+    }
     public boolean [] elevatorConnections(){
         if(elevatorMotorL.getBusVoltage() != 0){
             connections[0] = true;
