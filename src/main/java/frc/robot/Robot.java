@@ -6,10 +6,13 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-
+ 
 import com.fasterxml.jackson.databind.jsontype.impl.ClassNameIdResolver;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-
+import frc.robot.Ports;
+import frc.robot.commands.PickUpCommand;
+import frc.robot.commands.ScoreCommand;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -49,18 +52,21 @@ public class Robot extends LoggedRobot {
   private static Joystick stick;
   private static XboxController driver;
   private static XboxController operator;
+  private PneumaticHub junoHub = new PneumaticHub(20);
+  private final Compressor m_compressor = new Compressor(PneumaticsModuleType.REVPH);
   //initialization of the auton chooser in the dashboard
   private Command m_autoSelected;
 
-  // private final Compressor VCompressor = new Compressor(20, PneumaticsModuleType.REVPH);
+  private ScoreCommand scoreCommand;
+  private PickUpCommand pickUpCommand;
 
+ 
 
 
   // Double targetRange = null;
   // Double targetAngle = null;
 
    
-
   //that is a chooser for the autons utilizing the sendableChooser which allows us to choose the auton commands
   private SendableChooser<Command> m_chooser = new SendableChooser<>();
 
@@ -75,7 +81,11 @@ public class Robot extends LoggedRobot {
     claw = Claw.getInstance();
     climber = Climber.getInstance();
 
+    scoreCommand = new ScoreCommand();
+    pickUpCommand = new PickUpCommand();
 
+    NamedCommands.registerCommand("scoreCommand", scoreCommand);
+    NamedCommands.registerCommand("pickUpCommand", pickUpCommand);
     // litty = LED.getInstance();
     // camSystem = CameraSystem.getInstance();
     // camSystem.AddCamera(new PhotonCamera("Cam1"), new Transform3d(
@@ -92,21 +102,24 @@ public class Robot extends LoggedRobot {
     driver = new XboxController(0);
     operator = new XboxController(1);
    
-  
+    m_chooser.addOption("RPS", new PathPlannerAuto("RPS"));
+
     SmartDashboard.putData("Auto choices", m_chooser);
 
   }
 
   @Override
   public void robotPeriodic() {
-    elevator.updatePose();
+    
      SmartDashboard.putNumber("Elevator Position", elevator.getPosition(elevator.encoderL));
     SmartDashboard.putNumber("Elevator Position R", elevator.getPosition(elevator.encoderR));
+    SmartDashboard.putNumber("Absolute Encoder Pos", elevator.encoderA.getPosition());
       // Pose2d cameraPositionTele = camSystem.calculateRobotPosition();
 
       //  Pose2d posTele = drivebase.updateOdometry(cameraPositionTele);
 
-      // claw.compressor.enableAnalog(10,100);
+      junoHub.enableCompressorDigital();
+      m_compressor.enableDigital();
       //   SmartDashboard.putNumber("Odometry X", posTele.getX());
       //   SmartDashboard.putNumber("Odometry Y", posTele.getY());
 
@@ -226,7 +239,6 @@ public class Robot extends LoggedRobot {
   //  }
     drivebase.drive(xSpeed, ySpeed, rot);
 
-
     if(driver.getRightBumper()){
       claw.setWheelsOn();
     }else if(driver.getLeftBumper()){
@@ -243,7 +255,19 @@ public class Robot extends LoggedRobot {
     }else{
       elevator.elevatorOff();
     }
-
+    if(driver.getBButton() ){
+      elevator.setElevatorState(ElevatorState.BOT);
+      elevator.updatePose();
+    }else if(driver.getYButton()){
+      elevator.setElevatorState(ElevatorState.TOP);
+      elevator.updatePose();
+    }else if(driver.getXButton()){
+      elevator.setElevatorState(ElevatorState.MID);
+      elevator.updatePose();
+    }else if(driver.getAButton()){
+      elevator.setElevatorState(ElevatorState.GROUND);
+      elevator.updatePose();
+    }
     //  if(driver.getRightBumper()){
     //   climber.setLifterOn();
     // }else if(driver.getLeftBumper()){

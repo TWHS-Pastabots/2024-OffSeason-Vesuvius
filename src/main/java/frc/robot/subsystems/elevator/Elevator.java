@@ -2,12 +2,16 @@ package frc.robot.subsystems.elevator;
 
 import java.util.Set;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.Ports;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -37,15 +41,18 @@ public class Elevator {
     private SparkMaxPIDController elevatorControllerL;
     private SparkMaxPIDController elevatorControllerR;
     private static ElevatorFeedforward feedForward;
-    public static ElevatorState elevatorState = ElevatorState.BOT;
+    public ElevatorState elevatorState = ElevatorState.BOT;
     private boolean[] connections = new boolean[2];
-    
+
+    public AbsoluteEncoder encoderA;
+    public DigitalInput minPosEncoder;
 
     public enum ElevatorState{
         //THESE ARE JUST GUESSES CHANGE THEM LATER
-        BOT(0),
-        MID(25),
-        TOP(-40);
+        GROUND(-5),
+        BOT(-45),
+        MID(-69),
+        TOP(-86);
 
         public double position;
         private ElevatorState(double position){
@@ -56,7 +63,7 @@ public class Elevator {
         elevatorMotorL = new CANSparkMax(Ports.elevatorMotorL, MotorType.kBrushless);
         elevatorMotorL.restoreFactoryDefaults();
         elevatorMotorL.setSmartCurrentLimit(60);
-        elevatorMotorL.setIdleMode(IdleMode.kBrake);
+        elevatorMotorL.setIdleMode(IdleMode.kCoast);
         elevatorMotorL.setInverted(true);
         // elevatorMotorL.setOpenLoopRampRate(10);
         // elevatorMotorL.setClosedLoopRampRate(1);
@@ -65,11 +72,16 @@ public class Elevator {
         elevatorMotorR = new CANSparkMax(Ports.elevatorMotorR, MotorType.kBrushless);
         elevatorMotorR.restoreFactoryDefaults();
         elevatorMotorR.setSmartCurrentLimit(60);
-        elevatorMotorR.setIdleMode(IdleMode.kBrake);
+        elevatorMotorR.setIdleMode(IdleMode.kCoast);
         elevatorMotorR.setInverted(false);
         // elevatorMotorR.setOpenLoopRampRate(10);
         // elevatorMotorR.setClosedLoopRampRate(1);
 
+        encoderA = elevatorMotorL.getAbsoluteEncoder(Type.kDutyCycle);
+        encoderA.setPositionConversionFactor(100.0);
+        encoderA.setInverted(false);
+        //minPosEncoder  =  new DigitalInput(0);
+        
 
 
         //JUST A GUESS TUNE LATER
@@ -97,10 +109,10 @@ public class Elevator {
     }
 
     public void updatePose(){
-        elevatorControllerL.setReference(-20, CANSparkMax.ControlType.kPosition, 0,
+        elevatorControllerL.setReference(elevatorState.position, CANSparkMax.ControlType.kPosition, 0,
         feedForward.calculate(encoderL.getPosition(), 0));
 
-        elevatorControllerR.setReference(-20, CANSparkMax.ControlType.kPosition, 0,
+        elevatorControllerR.setReference(elevatorState.position, CANSparkMax.ControlType.kPosition, 0,
         feedForward.calculate(encoderR.getPosition(), 0));
 
        

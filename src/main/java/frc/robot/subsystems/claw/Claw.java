@@ -20,10 +20,9 @@ public class Claw {
  
 
     
-    // public PneumaticHub junoHub;
-    // public DoubleSolenoid cylinderR;
-    // public DoubleSolenoid cylinderL;
-    // public  Compressor compressor;
+    
+    public DoubleSolenoid cylinderR;
+    public DoubleSolenoid cylinderL;
 
 
     public Claw() {
@@ -42,14 +41,11 @@ public class Claw {
         wheel2.setIdleMode(IdleMode.kBrake);
         wheel2.setInverted(true);
         wheel2.burnFlash();
-
-         // Initialize compressor and solenoids (assuming PCM module and double solenoids)
-    //      compressor = new Compressor(PneumaticsModuleType.REVPH);
-    //      cylinderR = new DoubleSolenoid(PneumaticsModuleType.REVPH, 13, 15); // PCM channels 0, 1
-    //      cylinderL = new DoubleSolenoid(PneumaticsModuleType.REVPH, 12, 14); // PCM channels 2, 3
-
-    //      compressor.enableAnalog(10, 50);
-    //      retractCylinders();
+        
+         cylinderR = new DoubleSolenoid(PneumaticsModuleType.REVPH, 13, 15); // PCM channels 0, 1
+         cylinderL = new DoubleSolenoid(PneumaticsModuleType.REVPH, 12, 14); // PCM channels 2, 3
+         
+      
      }
 
     public void setWheelsOn(){
