@@ -103,17 +103,20 @@ public class Robot extends LoggedRobot {
     operator = new XboxController(1);
    
     m_chooser.addOption("RPS", new PathPlannerAuto("RPS"));
+    m_chooser.addOption("FieldTest", new PathPlannerAuto("FieldTest"));
 
     SmartDashboard.putData("Auto choices", m_chooser);
 
+    
   }
-
+  
   @Override
   public void robotPeriodic() {
     
      SmartDashboard.putNumber("Elevator Position", elevator.getPosition(elevator.encoderL));
     SmartDashboard.putNumber("Elevator Position R", elevator.getPosition(elevator.encoderR));
-    SmartDashboard.putNumber("Absolute Encoder Pos", elevator.encoderA.getPosition());
+    SmartDashboard.putNumber("Absolute Encoder ", elevator.encoderA.getPosition());
+
       // Pose2d cameraPositionTele = camSystem.calculateRobotPosition();
 
       //  Pose2d posTele = drivebase.updateOdometry(cameraPositionTele);

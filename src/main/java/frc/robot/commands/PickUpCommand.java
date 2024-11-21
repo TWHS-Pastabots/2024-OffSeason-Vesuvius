@@ -33,7 +33,7 @@ public class PickUpCommand extends Command {
   @Override
   public void execute() {
 
-    if(Timer.getFPGATimestamp() - startTime > 2)
+    if(Timer.getFPGATimestamp() - startTime > 4)
     {
       ended = true;
     }

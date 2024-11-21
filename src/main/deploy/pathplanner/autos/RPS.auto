@@ -12,9 +12,29 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "deadline",
           "data": {
-            "pathName": "Red to bucket"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Red to bucket"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "pickUpCommand"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
           }
         },
         {

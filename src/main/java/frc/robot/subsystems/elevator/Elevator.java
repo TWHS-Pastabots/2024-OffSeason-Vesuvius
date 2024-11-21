@@ -12,6 +12,7 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.I2C;
 import frc.robot.Ports;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -45,7 +46,12 @@ public class Elevator {
     private boolean[] connections = new boolean[2];
 
     public AbsoluteEncoder encoderA;
+    private double lastAbsolutePosition = 0.0; // Tracks the last read position
+    private double cumulativePosition = 0.0;  // Tracks the cumulative position
+    private static final double WRAP_THRESHOLD = 0.5; // Threshold to detect wraparound
     public DigitalInput minPosEncoder;
+
+    
 
     public enum ElevatorState{
         //THESE ARE JUST GUESSES CHANGE THEM LATER
@@ -118,6 +124,44 @@ public class Elevator {
        
         
     }
+
+    // public void updatePose() {
+    //     // Update the cumulative position based on the absolute encoder
+    //     updateCumulativePosition();
+    
+    //     // Use the cumulative position for the target position
+    //     double targetPosition = elevatorState.position;
+    
+    //     // Feedforward output to counteract gravity
+    //     double feedForwardOutput = feedForward.calculate(targetPosition, 0);
+    
+    //     // Set the target position for both motors using cumulative position
+    //     elevatorControllerL.setReference(targetPosition, CANSparkMax.ControlType.kPosition, 0, feedForwardOutput);
+    //     elevatorControllerR.setReference(targetPosition, CANSparkMax.ControlType.kPosition, 0, feedForwardOutput);
+    // }
+
+    // public double getCumulativePosition() {
+    //     return cumulativePosition;
+    // }
+
+    // private void updateCumulativePosition() {
+    //     double currentAbsolutePosition = encoderA.getPosition(); // Current raw encoder value
+    //     double positionDelta = currentAbsolutePosition - lastAbsolutePosition;
+    
+    //     // Detect wraparound
+    //     if (positionDelta > WRAP_THRESHOLD) {
+    //         cumulativePosition -= 1.0; // Wrapped downward
+    //     } else if (positionDelta < -WRAP_THRESHOLD) {
+    //         cumulativePosition += 1.0; // Wrapped upward
+    //     }
+    
+    //     // Add the delta to the cumulative position
+    //     cumulativePosition += positionDelta;
+    
+    //     // Update the last absolute position
+    //     lastAbsolutePosition = currentAbsolutePosition;
+    // }
+
     public void elevatorOn(){
         // // elevatorMotorL.set(-.25);
         // elevatorMotorR.set(-.25);
