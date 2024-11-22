@@ -104,16 +104,18 @@ public class Robot extends LoggedRobot {
    
     m_chooser.addOption("RPS", new PathPlannerAuto("RPS"));
     m_chooser.addOption("FieldTest", new PathPlannerAuto("FieldTest"));
+    m_chooser.addOption("TestPathX", new PathPlannerAuto("TestPathX"));
 
     SmartDashboard.putData("Auto choices", m_chooser);
 
-    
+
   }
   
   @Override
   public void robotPeriodic() {
-    
-     SmartDashboard.putNumber("Elevator Position", elevator.getPosition(elevator.encoderL));
+    SmartDashboard.putNumber("X-coordinate", drivebase.getPose().getX());
+    SmartDashboard.putNumber("Y-coordinate", drivebase.getPose().getY());
+    SmartDashboard.putNumber("Elevator Position", elevator.getPosition(elevator.encoderL));
     SmartDashboard.putNumber("Elevator Position R", elevator.getPosition(elevator.encoderR));
     SmartDashboard.putNumber("Absolute Encoder ", elevator.encoderA.getPosition());
 
@@ -317,8 +319,7 @@ public class Robot extends LoggedRobot {
     if (driver.getPOV() == 0) {
       drivebase.zeroHeading();
     }
-    
-    
+
 
     // if (driver.getRightTriggerAxis() > 0) {
     //   drivebase.setDriveState(DriveState.SLOW);
