@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import frc.robot.Ports;
 import frc.robot.commands.ElevatorBotCommand;
+import frc.robot.commands.HawkTuah;
 import frc.robot.commands.PickUpCommand;
 import frc.robot.commands.RotationCommand;
 import frc.robot.commands.ScoreCommand;
@@ -59,6 +60,7 @@ public class Robot extends LoggedRobot {
   //initialization of the auton chooser in the dashboard
   private Command m_autoSelected;
 
+  private HawkTuah hawkTuah;
   private ScoreCommand scoreCommand;
   private PickUpCommand pickUpCommand;
   private RotationCommand rotationCommand;
@@ -88,11 +90,13 @@ public class Robot extends LoggedRobot {
     pickUpCommand = new PickUpCommand();
     rotationCommand = new RotationCommand(Math.toRadians(90));
     elevatorBotCommand = new ElevatorBotCommand();
+    hawkTuah =  new HawkTuah();
 
     NamedCommands.registerCommand("scoreCommand", scoreCommand);
     NamedCommands.registerCommand("pickUpCommand", pickUpCommand);
     NamedCommands.registerCommand("rotationCommand", rotationCommand);
     NamedCommands.registerCommand("elevatorBotCommand", elevatorBotCommand);
+    NamedCommands.registerCommand("outtake", hawkTuah);
     // litty = LED.getInstance();
     camSystem = CameraSystem.getInstance();
     camSystem.AddCamera(new PhotonCamera("FrontCam"), new Transform3d(
@@ -211,7 +215,7 @@ public class Robot extends LoggedRobot {
     camSystem.ChangeCamOffset(elevator.getPosition(elevator.encoderR));
     // Pose2d cameraPosition = camSystem.calculateRobotPosition(); 
     // Pose2d pose = drivebase.updateOdometry(cameraPosition);
-    camSystem.AddVisionMeasurements(Drivebase.poseEstimator);
+    // camSystem.AddVisionMeasurements(Drivebase.poseEstimator);
 
 
     SmartDashboard.putNumber("Auto X", drivebase.getPose().getX());

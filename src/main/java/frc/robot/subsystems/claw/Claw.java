@@ -59,8 +59,8 @@ public class Claw {
     }
 
     public void setWheelsOff(){
-        wheel1.set(0.05);
-        wheel2.set(0.05);
+        wheel1.set(0.1);
+        wheel2.set(0.1);
     }
 
     // public boolean isCompressorEnabled(){

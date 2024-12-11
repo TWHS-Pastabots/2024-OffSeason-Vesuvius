@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.9090678181356378,
-        "y": 5.930032629296028
+        "x": 3.1409101334607787,
+        "y": 6.616622648366552
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.0180535745686892,
-        "y": 6.117504542701393
+        "x": 0.9861162090369815,
+        "y": 6.0193699845316955
       },
       "prevControl": {
-        "x": 2.7349016236494026,
-        "y": 5.347883003458315
+        "x": 2.702964258117695,
+        "y": 5.249748445288617
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,7 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.15,
-      "rotationDegrees": -90.0,
+      "rotationDegrees": -70.0,
       "rotateFast": true
     }
   ],
@@ -39,14 +39,14 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 1.0,
-    "maxAcceleration": 4.0,
-    "maxAngularVelocity": 800.0,
-    "maxAngularAcceleration": 600.0
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 150.0,
+    "maxAngularAcceleration": 125.0
   },
   "goalEndState": {
     "velocity": 0,
     "rotation": 180.0,
-    "rotateFast": true
+    "rotateFast": false
   },
   "reversed": false,
   "folder": "BucketToScore",

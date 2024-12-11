@@ -13,7 +13,7 @@
     "RedStart"
   ],
   "defaultMaxVel": 2.0,
-  "defaultMaxAccel": 4.0,
+  "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 800.0,
   "defaultMaxAngAccel": 600.0,
   "maxModuleSpeed": 3.0

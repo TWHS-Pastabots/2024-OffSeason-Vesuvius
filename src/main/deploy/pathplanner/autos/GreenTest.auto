@@ -26,26 +26,25 @@
                       }
                     },
                     {
-                      "type": "deadline",
+                      "type": "named",
+                      "data": {
+                        "name": "elevatorBotCommand"
+                      }
+                    },
+                    {
+                      "type": "sequential",
                       "data": {
                         "commands": [
                           {
-                            "type": "named",
+                            "type": "path",
                             "data": {
-                              "name": "elevatorBotCommand"
+                              "pathName": "GreenScore"
                             }
                           },
                           {
-                            "type": "sequential",
+                            "type": "named",
                             "data": {
-                              "commands": [
-                                {
-                                  "type": "path",
-                                  "data": {
-                                    "pathName": "GreenScore"
-                                  }
-                                }
-                              ]
+                              "name": "outtake"
                             }
                           }
                         ]
@@ -58,6 +57,32 @@
                 "type": "named",
                 "data": {
                   "name": "pickUpCommand"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "deadline",
+          "data": {
+            "commands": [
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "BlueIntakeGreenSide"
+                      }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "elevatorBotCommand"
+                      }
+                    }
+                  ]
                 }
               }
             ]
