@@ -2,11 +2,19 @@
   "robotWidth": 0.9,
   "robotLength": 0.9,
   "holonomicMode": true,
-  "pathFolders": [],
-  "autoFolders": [],
-  "defaultMaxVel": 4.0,
-  "defaultMaxAccel": 3.0,
+  "pathFolders": [
+    "BlueBucket",
+    "BucketToScore",
+    "GreenStart",
+    "RedStart"
+  ],
+  "autoFolders": [
+    "Green Start",
+    "RedStart"
+  ],
+  "defaultMaxVel": 2.0,
+  "defaultMaxAccel": 4.0,
   "defaultMaxAngVel": 800.0,
   "defaultMaxAngAccel": 600.0,
-  "maxModuleSpeed": 4.0
+  "maxModuleSpeed": 3.0
 }

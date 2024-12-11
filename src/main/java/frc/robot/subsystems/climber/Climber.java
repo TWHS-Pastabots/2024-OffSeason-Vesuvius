@@ -41,7 +41,7 @@ public class Climber {
 
         TomahawkL.setSmartCurrentLimit(60);
         TomahawkL.setIdleMode(IdleMode.kBrake);
-        TomahawkL.setInverted(true);
+        TomahawkL.setInverted(false);
         TomahawkL.setOpenLoopRampRate(3);
 
         TomahawkL.burnFlash();
@@ -82,20 +82,20 @@ public class Climber {
     }
 
     public void setTommysOn(){
-        TomahawkR.set(.9);
-        TomahawkL.set(.9);
+        TomahawkR.set(1);
+        TomahawkL.set(1);
       
 
     }
 
     public void setTommysReverse(){
-        TomahawkR.set(-.9);
-        TomahawkL.set(-.9);
+        TomahawkR.set(-1);
+        TomahawkL.set(-1);
         
     }
 
     public void setTommysOff(){
-        TomahawkR.set(0.0);
+        TomahawkR.set(0.02);
         TomahawkL.set(0.0);
         
 
@@ -132,8 +132,8 @@ public class Climber {
     }
 
     public void setLifterOff(){
-        LifterR.set(0.05);
-        LifterL.set(0.05);
+        LifterR.set(0.0);
+        LifterL.set(0.0);
     }
 
 

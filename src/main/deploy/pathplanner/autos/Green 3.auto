@@ -1,0 +1,55 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.4,
+      "y": 6.985795510052559
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Green-Bucket"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "GreenScore"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BlueIntakeGreenSide"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BlueScore"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BlueToRedBucket"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RedScore"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Green Start",
+  "choreoAuto": false
+}

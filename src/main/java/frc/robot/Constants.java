@@ -5,9 +5,13 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax.IdleMode;
-
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -27,7 +31,7 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxSpeedMetersPerSecond = 2;
     // competition 5 m/s
     public static final double kMaxAngularSpeed = Math.PI/2; // radians per second
     // competition 2pi
@@ -37,9 +41,9 @@ public final class Constants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(26.7);
+    public static final double kTrackWidth = Units.inchesToMeters(26.5);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(26.7);
+    public static final double kWheelBase = Units.inchesToMeters(26.5);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
 
@@ -87,14 +91,14 @@ public final class Constants {
     public static final double kTurningEncoderPositionPIDMinInput = 0; // radians
     public static final double kTurningEncoderPositionPIDMaxInput = kTurningEncoderPositionFactor; // radians
 
-    public static final double kDrivingP = 1.0;
+    public static final double kDrivingP = .08;
     public static final double kDrivingI = 0;
     public static final double kDrivingD = 0;
     public static final double kDrivingFF = 1 / kDriveWheelFreeSpeedRps;
     public static final double kDrivingMinOutput = -1;
     public static final double kDrivingMaxOutput = 1;
 
-    public static final double kTurningP = 1.5;
+    public static final double kTurningP = 1.4;
     public static final double kTurningI = 0.00;
     //.008
     public static final double kTurningD = 0;
@@ -115,8 +119,8 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 4.0;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+    public static final double kMaxSpeedMetersPerSecond = 2;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
@@ -150,6 +154,25 @@ public final class Constants {
     // prototype numbers:
     // P: .1 I: 0 D: 0
 
+  }
+  public static final class VisionConstants {
+    public static final double APRILTAG_AMBIGUITY_THRESHOLD = 0.2;
+    public static final double POSE_AMBIGUITY_SHIFTER = 0.2;
+    public static final double POSE_AMBIGUITY_MULTIPLIER = 4;
+    public static final double NOISY_DISTANCE_METERS = 2.5;
+    public static final double DISTANCE_WEIGHT = 7;
+    public static final int TAG_PRESENCE_WEIGHT = 10;
+    public static final Matrix<N3,N1> VISION_MEASUREMENT_STANDARD_DEVIATIONS = MatBuilder.fill(Nat.N3(), Nat.N1()
+    , 1,
+    1,
+    1 * Math.PI);
+
+    public static final Matrix<N3, N1> STATE_STANDARD_DEVIATIONS = MatBuilder.fill(Nat.N3(), Nat.N1(),
+        // if these numbers are less than one, multiplying will do bad things
+        .1, // x
+        .1, // y
+        .1);
+       
   }
 
 }

@@ -1,0 +1,50 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.9983196889470716,
+      "y": 4.144115980539654
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Red-Bucket"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "pickUpCommand"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RedScore"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "RedStart",
+  "choreoAuto": false
+}

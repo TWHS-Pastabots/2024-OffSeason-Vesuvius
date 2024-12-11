@@ -11,7 +11,9 @@ import com.fasterxml.jackson.databind.jsontype.impl.ClassNameIdResolver;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import frc.robot.Ports;
+import frc.robot.commands.ElevatorBotCommand;
 import frc.robot.commands.PickUpCommand;
+import frc.robot.commands.RotationCommand;
 import frc.robot.commands.ScoreCommand;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -45,7 +47,7 @@ public class Robot extends LoggedRobot {
   private Drivebase drivebase;
   private Elevator elevator;
   // private LED litty;
-  // private CameraSystem camSystem;
+  private CameraSystem camSystem;
   private Claw claw;
   private Climber climber;
   private static GenericHID board;
@@ -59,8 +61,8 @@ public class Robot extends LoggedRobot {
 
   private ScoreCommand scoreCommand;
   private PickUpCommand pickUpCommand;
-
- 
+  private RotationCommand rotationCommand;
+  private ElevatorBotCommand elevatorBotCommand;
 
 
   // Double targetRange = null;
@@ -80,21 +82,26 @@ public class Robot extends LoggedRobot {
     elevator = Elevator.getInstance();
     claw = Claw.getInstance();
     climber = Climber.getInstance();
+    camSystem = CameraSystem.getInstance();
 
     scoreCommand = new ScoreCommand();
     pickUpCommand = new PickUpCommand();
+    rotationCommand = new RotationCommand(Math.toRadians(90));
+    elevatorBotCommand = new ElevatorBotCommand();
 
     NamedCommands.registerCommand("scoreCommand", scoreCommand);
     NamedCommands.registerCommand("pickUpCommand", pickUpCommand);
+    NamedCommands.registerCommand("rotationCommand", rotationCommand);
+    NamedCommands.registerCommand("elevatorBotCommand", elevatorBotCommand);
     // litty = LED.getInstance();
-    // camSystem = CameraSystem.getInstance();
-    // camSystem.AddCamera(new PhotonCamera("Cam1"), new Transform3d(
-    //     new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0))
-    //     ,  true);
+    camSystem = CameraSystem.getInstance();
+    camSystem.AddCamera(new PhotonCamera("FrontCam"), new Transform3d(
+        new Translation3d(0.11, .50, 0.0), new Rotation3d(0.0, Math.toRadians(15), 0.0))
+        ,  true);
 
-    // camSystem.AddCamera(new PhotonCamera("Cam2"),  new Transform3d(
-    //   new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0)),
-    //    true);
+    camSystem.AddCamera(new PhotonCamera("BackCam"),  new Transform3d(
+      new Translation3d(-0.31, 1.051, 0.0), new Rotation3d(0.0, 0.0, 0.0)),
+       true);
 
     board = new GenericHID(2);
     stick = new Joystick(2);
@@ -105,6 +112,9 @@ public class Robot extends LoggedRobot {
     m_chooser.addOption("RPS", new PathPlannerAuto("RPS"));
     m_chooser.addOption("FieldTest", new PathPlannerAuto("FieldTest"));
     m_chooser.addOption("TestPathX", new PathPlannerAuto("TestPathX"));
+    m_chooser.addOption("RedScore1", new PathPlannerAuto("OneRedScore"));
+    m_chooser.addOption("Green 3", new PathPlannerAuto("Green 3"));
+    m_chooser.addOption("GreenTest", new PathPlannerAuto("GreenTest"));
 
     SmartDashboard.putData("Auto choices", m_chooser);
 
@@ -123,8 +133,8 @@ public class Robot extends LoggedRobot {
 
       //  Pose2d posTele = drivebase.updateOdometry(cameraPositionTele);
 
-      junoHub.enableCompressorDigital();
-      m_compressor.enableDigital();
+      // junoHub.enableCompressorDigital();
+      // m_compressor.enableDigital();
       //   SmartDashboard.putNumber("Odometry X", posTele.getX());
       //   SmartDashboard.putNumber("Odometry Y", posTele.getY());
 
@@ -198,11 +208,14 @@ public class Robot extends LoggedRobot {
     //updating the intake for the autointake command
     //using cameras to calculate the robot position instead of odometry.
     //we use a mix of odometry + camera positions to calculate the robot position
+    camSystem.ChangeCamOffset(elevator.getPosition(elevator.encoderR));
     // Pose2d cameraPosition = camSystem.calculateRobotPosition(); 
     // Pose2d pose = drivebase.updateOdometry(cameraPosition);
+    camSystem.AddVisionMeasurements(Drivebase.poseEstimator);
 
-    // SmartDashboard.putNumber("Auto X", drivebase.getPose().getX());
-    // SmartDashboard.putNumber("Auto Y", drivebase.getPose().getY());
+
+    SmartDashboard.putNumber("Auto X", drivebase.getPose().getX());
+    SmartDashboard.putNumber("Auto Y", drivebase.getPose().getY());
     // SmartDashboard.putNumber("Odometry X", pose.getX());
     // SmartDashboard.putNumber("Odometry Y", pose.getY());
   }
@@ -243,43 +256,34 @@ public class Robot extends LoggedRobot {
   //   rot = drivebase.inputDeadband(-stick.getRawAxis(3)*.17);
   //  }
     drivebase.drive(xSpeed, ySpeed, rot);
+   
 
-    if(driver.getRightBumper()){
+
+    // if(driver.getRightTriggerAxis()>0.0){
+    //   elevator.elevatorOn();
+      
+    // }else if(driver.getLeftTriggerAxis()>0.0){
+    //   elevator.elevatorReverse();
+    // }else{
+    //   elevator.elevatorOff();
+    // }
+    
+
+    //  if(driver.getAButton()){
+    //   elevator.setElevatorState(ElevatorState.BOT);
+    //   elevator.updatePose();
+    //  }
+
+
+
+
+     if(driver.getRightBumper()){
       claw.setWheelsOn();
     }else if(driver.getLeftBumper()){
       claw.setWheelsReverse();
     }else{
       claw.setWheelsOff();
     }
-
-    if(driver.getRightTriggerAxis()>0.0){
-      elevator.elevatorOn();
-      
-    }else if(driver.getLeftTriggerAxis()>0.0){
-      elevator.elevatorReverse();
-    }else{
-      elevator.elevatorOff();
-    }
-    if(driver.getBButton() ){
-      elevator.setElevatorState(ElevatorState.BOT);
-      elevator.updatePose();
-    }else if(driver.getYButton()){
-      elevator.setElevatorState(ElevatorState.TOP);
-      elevator.updatePose();
-    }else if(driver.getXButton()){
-      elevator.setElevatorState(ElevatorState.MID);
-      elevator.updatePose();
-    }else if(driver.getAButton()){
-      elevator.setElevatorState(ElevatorState.GROUND);
-      elevator.updatePose();
-    }
-    //  if(driver.getRightBumper()){
-    //   climber.setLifterOn();
-    // }else if(driver.getLeftBumper()){
-    //   climber.setLifterReverse();
-    // }else{
-    //   climber.setLifterOff();
-    // }
 
     //  if(driver.getXButton()){
     //   climber.setTommysWheelsOn();
@@ -289,7 +293,7 @@ public class Robot extends LoggedRobot {
     //   climber.setTommysWheelsOff();
     // }
 
-  
+      
 
 
 
@@ -319,6 +323,10 @@ public class Robot extends LoggedRobot {
     if (driver.getPOV() == 0) {
       drivebase.zeroHeading();
     }
+    // if (driver.getAButton()){
+    //   Double yaw = camSystem.getYawForTag(0, 2);
+
+    // }
 
 
     // if (driver.getRightTriggerAxis() > 0) {

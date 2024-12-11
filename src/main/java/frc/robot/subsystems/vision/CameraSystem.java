@@ -1,14 +1,20 @@
 package frc.robot.subsystems.vision;
 import java.util.ArrayList;
 
+import edu.wpi.first.math.MatBuilder;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
@@ -65,6 +71,58 @@ public class CameraSystem{
         offsets.add(offset);
         estimators.add(new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, camera, offset));
         this.hasAprilTagDetection.add(hasAprilTagDetection);
+    }
+    public void AddVisionMeasurements(SwerveDrivePoseEstimator swerveEstimator)
+    {
+        int cameraCount = 0;
+        for (var estimator : estimators) 
+        {
+            if(CameraHasAprilTagDetection(cameraCount))
+            {
+                Optional<EstimatedRobotPose> estimatedPose = estimator.update(getResult(cameraCount));
+                Matrix<N3,N1> camStdDev = confidenceCalculator(cameraCount);
+                if(!estimatedPose.isEmpty() && camStdDev != null)
+                {
+                    Pose2d camRobotPose = estimatedPose.get().estimatedPose.toPose2d();
+                    double timestamp = estimatedPose.get().timestampSeconds;
+                    swerveEstimator.addVisionMeasurement(camRobotPose, timestamp, camStdDev);
+                }
+            }
+            cameraCount++;
+        }
+    } 
+    private Matrix<N3, N1> confidenceCalculator(int position) 
+    {
+        Optional<EstimatedRobotPose> estimationPose = usePoseEstimator(position, null);
+        if(!estimationPose.isEmpty())
+        {
+            EstimatedRobotPose estimation = estimationPose.get();
+            double smallestDistance = Double.POSITIVE_INFINITY;
+            for (var target : estimation.targetsUsed)  
+            {
+                var t3d = target.getBestCameraToTarget();
+                double distance = Math.sqrt(Math.pow(t3d.getX(), 2) + Math.pow(t3d.getY(), 2) + Math.pow(t3d.getZ(), 2));
+                if (distance < smallestDistance)
+                    smallestDistance = distance;
+            }
+            double poseAmbiguityFactor = estimation.targetsUsed.size() != 1
+            ? 1
+            : Math.max(
+                1,
+                (estimation.targetsUsed.get(0).getPoseAmbiguity()
+                    + Constants.VisionConstants.POSE_AMBIGUITY_SHIFTER)
+                    * Constants.VisionConstants.POSE_AMBIGUITY_MULTIPLIER);
+            double confidenceMultiplier = Math.max(
+            1,
+            (Math.max(
+                1,
+                Math.max(0, smallestDistance - Constants.VisionConstants.NOISY_DISTANCE_METERS)
+                * Constants.VisionConstants.DISTANCE_WEIGHT) * poseAmbiguityFactor)
+                / (1 + ((estimation.targetsUsed.size() - 1) * Constants.VisionConstants.TAG_PRESENCE_WEIGHT)));
+
+            return Constants.VisionConstants.VISION_MEASUREMENT_STANDARD_DEVIATIONS.times(confidenceMultiplier);
+        }
+        return null;
     }
     // calculates robot position
      public Pose2d calculateRobotPosition() {
@@ -251,6 +309,15 @@ public class CameraSystem{
             }
 
         return targetRange;
+    }
+    public void ChangeCamOffset(double encoderVal)
+    {
+        double camHeight = (encoderVal * -0.570855) + 19.67;
+        double camLength = (encoderVal * -0.000839631) + 0.11;
+        offsets.set(0, new Transform3d(new Translation3d(camLength,camHeight,0), 
+        new Rotation3d(0,Math.toRadians(15),0)));
+        estimators.get(0).setRobotToCameraTransform(
+            new Transform3d(new Translation3d(camLength,camHeight,0), new Rotation3d(0,Math.toRadians(15),0)));
     }
     // Field coordinates for the april tags (converting inches to meters)
     private void initializeFiducialMap(double inchesToMeters) {

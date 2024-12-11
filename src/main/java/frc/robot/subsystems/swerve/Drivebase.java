@@ -69,7 +69,7 @@ public class Drivebase extends SubsystemBase {
 
   Field2d fieldmap = new Field2d();
 
-  private static SwerveDrivePoseEstimator poseEstimator;
+  public static SwerveDrivePoseEstimator poseEstimator;
 
   private ProfiledPIDController headingController;
 
@@ -107,11 +107,10 @@ public class Drivebase extends SubsystemBase {
     //TRAPAZOID MOTION PROFILE define the maximum velocity and acceleration (MAKE SURE TO TWEAK BEFORE EVERY SWERVE) 
     headingController = new ProfiledPIDController(4.5, 0, 0, new TrapezoidProfile.Constraints(0, 0), .02);
     headingController.enableContinuousInput(-Math.PI, Math.PI);
-
     
     //PID constants for both translation and rotation, along with a path-following configuration (Edit for path following autos)
-    config = new HolonomicPathFollowerConfig(new PIDConstants(1.4, 0, 0),
-        new PIDConstants(1.1, 0.0000, 0.0),
+    config = new HolonomicPathFollowerConfig(new PIDConstants(8.5, 0, 0),
+        new PIDConstants(8.3, 0.0000, 0.0),
         // 0.12, 0.00001, 0.0
         5, Math.sqrt(Math.pow(DriveConstants.kTrackWidth / 2, 2) +
             Math.pow(DriveConstants.kWheelBase / 2, 2)),

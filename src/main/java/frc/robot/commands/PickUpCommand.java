@@ -26,14 +26,14 @@ public class PickUpCommand extends Command {
   public void initialize() {
     ended = false;
     startTime = Timer.getFPGATimestamp();
-    claw.setWheelsReverse();
+    claw.setWheelsOn();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
-    if(Timer.getFPGATimestamp() - startTime > 4)
+    if(Timer.getFPGATimestamp() - startTime > 2.5)
     {
       ended = true;
     }
