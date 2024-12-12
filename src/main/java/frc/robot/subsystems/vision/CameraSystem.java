@@ -180,7 +180,9 @@ public class CameraSystem{
     }
     // runs the orginal pose and puts it through it corresponding estimator
     private Optional<EstimatedRobotPose> usePoseEstimator(int position, Pose2d prevPose){
-        estimators.get(position).setReferencePose(prevPose);
+        if(prevPose != null){
+            estimators.get(position).setReferencePose(prevPose);
+        }
         return estimators.get(position).update();
     }
     // calculates the postition of tag to robot from one camera's results 
@@ -314,10 +316,10 @@ public class CameraSystem{
     {
         double camHeight = (encoderVal * -0.570855) + 19.67;
         double camLength = (encoderVal * -0.000839631) + 0.11;
-        offsets.set(0, new Transform3d(new Translation3d(camLength,camHeight,0), 
+        offsets.set(0, new Transform3d(new Translation3d(camLength,0.0,camHeight), 
         new Rotation3d(0,Math.toRadians(15),0)));
         estimators.get(0).setRobotToCameraTransform(
-            new Transform3d(new Translation3d(camLength,camHeight,0), new Rotation3d(0,Math.toRadians(15),0)));
+            new Transform3d(new Translation3d(camLength,0.0,camHeight), new Rotation3d(0,Math.toRadians(15),0)));
     }
     // Field coordinates for the april tags (converting inches to meters)
     private void initializeFiducialMap(double inchesToMeters) {

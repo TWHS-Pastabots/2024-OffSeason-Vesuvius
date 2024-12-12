@@ -66,6 +66,8 @@ public class Robot extends LoggedRobot {
   private RotationCommand rotationCommand;
   private ElevatorBotCommand elevatorBotCommand;
 
+  private int tagID;
+
 
   // Double targetRange = null;
   // Double targetAngle = null;
@@ -78,7 +80,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
 
-
+    tagID = 1;
 
     drivebase = Drivebase.getInstance();
     elevator = Elevator.getInstance();
@@ -100,11 +102,11 @@ public class Robot extends LoggedRobot {
     // litty = LED.getInstance();
     camSystem = CameraSystem.getInstance();
     camSystem.AddCamera(new PhotonCamera("FrontCam"), new Transform3d(
-        new Translation3d(0.11, .50, 0.0), new Rotation3d(0.0, Math.toRadians(15), 0.0))
+        new Translation3d(0.11, 0.0, -.50), new Rotation3d(0.0, Math.toRadians(15), 0.0))
         ,  true);
 
     camSystem.AddCamera(new PhotonCamera("BackCam"),  new Transform3d(
-      new Translation3d(-0.31, 1.051, 0.0), new Rotation3d(0.0, 0.0, 0.0)),
+      new Translation3d(-0.31, 0.0, -1.051), new Rotation3d(0.0, 0.0, 0.0)),
        true);
 
     board = new GenericHID(2);
@@ -174,7 +176,7 @@ public class Robot extends LoggedRobot {
     
     CommandScheduler.getInstance().run();
     drivebase.periodic();
-      
+    camSystem.ChangeCamOffset(elevator.getPosition(elevator.encoderR));
     //putting all of the info from the subsystems into the dashvoard so we can test things
     SmartDashboard.putNumber("Gyro Angle:", (drivebase.getHeading() + 90) % 360);
     // SmartDashboard.putNumber("CRF", claw.cylinderR.getFwdChannel());
@@ -212,10 +214,10 @@ public class Robot extends LoggedRobot {
     //updating the intake for the autointake command
     //using cameras to calculate the robot position instead of odometry.
     //we use a mix of odometry + camera positions to calculate the robot position
-    camSystem.ChangeCamOffset(elevator.getPosition(elevator.encoderR));
+    
     // Pose2d cameraPosition = camSystem.calculateRobotPosition(); 
     // Pose2d pose = drivebase.updateOdometry(cameraPosition);
-    // camSystem.AddVisionMeasurements(Drivebase.poseEstimator);
+    camSystem.AddVisionMeasurements(Drivebase.poseEstimator);
 
 
     SmartDashboard.putNumber("Auto X", drivebase.getPose().getX());
@@ -259,7 +261,7 @@ public class Robot extends LoggedRobot {
   //  }else{
   //   rot = drivebase.inputDeadband(-stick.getRawAxis(3)*.17);
   //  }
-    drivebase.drive(xSpeed, ySpeed, rot);
+    
    
 
 
@@ -277,8 +279,27 @@ public class Robot extends LoggedRobot {
     //   elevator.setElevatorState(ElevatorState.BOT);
     //   elevator.updatePose();
     //  }
+    if(driver.getBButton())
+    {
+      tagID = 1;
+    }
+    else if(driver.getYButton())
+    {
+      tagID = 2;
+    }
+    else if(driver.getXButton())
+    {
+      tagID = 3;
+    }
 
-
+    if (driver.getLeftTriggerAxis() > .1)
+    {
+      Double yaw = camSystem.getYawForTag(0, tagID);
+      if(yaw != null)
+      {
+        rot = -yaw * .02 * Constants.DriveConstants.kMaxAngularSpeed;
+      }
+    }  
 
 
      if(driver.getRightBumper()){
@@ -289,6 +310,8 @@ public class Robot extends LoggedRobot {
       claw.setWheelsOff();
     }
 
+
+    drivebase.drive(xSpeed, ySpeed, rot);
     //  if(driver.getXButton()){
     //   climber.setTommysWheelsOn();
     // }else if(driver.getBButton()){
