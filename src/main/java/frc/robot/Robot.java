@@ -426,14 +426,26 @@ public class Robot extends LoggedRobot {
     //   claw.setWheelsOff();
     //   elevator.elevatorOff();
     // }
-    // if (operator.getPOV() == 90){
-    //   elevator.setElevatorState(ElevatorState.TOP);
-    // } else if(operator.getPOV() == 0){
-    //   elevator.setElevatorState(ElevatorState.MID);
-    // } else if(operator.getPOV() == 270){
-    //   elevator.setElevatorState(ElevatorState.BOT);
-    // }
+    if (driver.getPOV() == 90){
+      elevator.setElevatorState(ElevatorState.TOP);
+      elevator.updatePose();
+    } else if(driver.getAButton()){
+      elevator.setElevatorState(ElevatorState.MID);
+            elevator.updatePose();
+
+    } else if(driver.getPOV() == 270){
+      elevator.setElevatorState(ElevatorState.BOT);
+            elevator.updatePose();
+
+    }else if(driver.getPOV() == 180){
+      elevator.setElevatorState(ElevatorState.GROUND);
+      elevator.updatePose();
+    }
+
     
+
+    
+
 
   }
     

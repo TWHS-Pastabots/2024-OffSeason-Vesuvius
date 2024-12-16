@@ -1,4 +1,5 @@
 package frc.robot.subsystems.vision;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import edu.wpi.first.math.MatBuilder;
@@ -38,8 +39,13 @@ public class CameraSystem{
     private ArrayList<Transform3d> offsets;
     private ArrayList<PhotonPoseEstimator> estimators;
     private ArrayList<Boolean> hasAprilTagDetection;
-    public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    private String test = "test";
+
+    public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFields.valueOf("BucketFieldLayout.json").loadAprilTagLayoutField();
     
+    //AprilTagFields.valueOf("BucketFieldLayout.json").loadAprilTagLayoutField();
+    //new AprilTagFieldLayout("c:\\Documents/GitHub/2024-OffSeason-Juno/src/main/java/frc/robot/subsystems/vision/BucketFieldLayout.json");
+    // AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
     private static CameraSystem instance;
 
